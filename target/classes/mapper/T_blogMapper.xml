@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjs.blogserver.dao.T_blogMapper" >
+  <resultMap id="BaseResultMap" type="com.zjs.blogserver.bean.T_blog" >
+    <id column="blog_id" property="blog_id" jdbcType="INTEGER" />
+    <result column="blog_title" property="blog_title" jdbcType="VARCHAR" />
+    <result column="blog_summary" property="blog_summary" jdbcType="VARCHAR" />
+    <result column="blog_imgurl" property="blog_imgurl" jdbcType="VARCHAR" />
+    <result column="publish_date" property="publish_date" jdbcType="TIMESTAMP" />
+    <result column="click_num" property="click_num" jdbcType="INTEGER" />
+    <result column="replace_num" property="replace_num" jdbcType="INTEGER" />
+    <result column="type_id" property="type_id" jdbcType="INTEGER" />
+    <result column="key_word" property="key_word" jdbcType="VARCHAR" />
+    <result column="blog_status" property="blog_status" jdbcType="BIT" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zjs.blogserver.bean.T_blog" extends="BaseResultMap" >
+    <result column="blog_content" property="blog_content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    blog_id, blog_title, blog_summary, blog_imgurl, publish_date, click_num, replace_num, 
+    type_id, key_word, blog_status
+  </sql>
+  <sql id="Blob_Column_List" >
+    blog_content
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_blog
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+  </select>
+  <select id="findAllBlog" parameterType="java.util.Map" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_blog
+    where 1=1
+    <if test="blog_status != null and blog_status != '' and blog_status != false">
+      and blog_status = #{blog_status}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      and blog_title LIKE "%"#{keyword}"%" OR blog_summary LIKE "%"#{keyword}"%" OR key_word LIKE "%"#{keyword}"%"
+    </if>
+    order by ${type} desc
+  </select>
+  <select id="findPublishBlogName" resultMap="BaseResultMap">
+    select blog_id,blog_title
+    from t_blog
+    where blog_status = true
+  </select>
+  <select id="findAllBlogOrderByPublishDate" parameterType="Boolean" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_blog
+    where blog_status = #{blog_status,jdbcType=BIT}
+    order by publish_date desc
+  </select>
+  <select id="findAllBlogOrderByClickNum" parameterType="Boolean" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_blog
+    where blog_status = #{blog_status,jdbcType=BIT}
+    order by click_num desc
+  </select>
+  <select id="findAllBlogOrderByReplaceNum" parameterType="Boolean" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_blog
+    where blog_status = #{blog_status,jdbcType=BIT}
+    order by replace_num desc
+  </select>
+  <select id="getBlogNumOfType" resultType="java.util.Map">
+    select type_id as blogtype_id,count(type_id) as sum
+    from t_blog
+    where blog_status = true
+    group by type_id
+    order by sum desc
+  </select>
+  <select id="getBlogByTypeId" parameterType="java.util.Map" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_blog
+    where type_id = #{blogtype_id,jdbcType=INTEGER} and blog_status = #{blog_status,jdbcType=BIT}
+    order by ${sort_type} desc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_blog
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zjs.blogserver.bean.T_blog" >
+    insert into t_blog (blog_id, blog_title, blog_summary, 
+      blog_imgurl, publish_date, click_num, 
+      replace_num, type_id, key_word, 
+      blog_status, blog_content)
+    values (#{blog_id,jdbcType=INTEGER}, #{blog_title,jdbcType=VARCHAR}, #{blog_summary,jdbcType=VARCHAR}, 
+      #{blog_imgurl,jdbcType=VARCHAR}, #{publish_date,jdbcType=TIMESTAMP}, #{click_num,jdbcType=INTEGER},
+      #{replace_num,jdbcType=INTEGER}, #{type_id,jdbcType=INTEGER}, #{key_word,jdbcType=VARCHAR}, 
+      #{blog_status,jdbcType=BIT}, #{blog_content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjs.blogserver.bean.T_blog" >
+    insert into t_blog
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="blog_id != null" >
+        blog_id,
+      </if>
+      <if test="blog_title != null" >
+        blog_title,
+      </if>
+      <if test="blog_summary != null" >
+        blog_summary,
+      </if>
+      <if test="blog_imgurl != null" >
+        blog_imgurl,
+      </if>
+      <if test="publish_date != null" >
+        publish_date,
+      </if>
+      <if test="click_num != null" >
+        click_num,
+      </if>
+      <if test="replace_num != null" >
+        replace_num,
+      </if>
+      <if test="type_id != null" >
+        type_id,
+      </if>
+      <if test="key_word != null" >
+        key_word,
+      </if>
+      <if test="blog_status != null" >
+        blog_status,
+      </if>
+      <if test="blog_content != null" >
+        blog_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="blog_id != null" >
+        #{blog_id,jdbcType=INTEGER},
+      </if>
+      <if test="blog_title != null" >
+        #{blog_title,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_summary != null" >
+        #{blog_summary,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_imgurl != null" >
+        #{blog_imgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="publish_date != null" >
+        #{publish_date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="click_num != null" >
+        #{click_num,jdbcType=INTEGER},
+      </if>
+      <if test="replace_num != null" >
+        #{replace_num,jdbcType=INTEGER},
+      </if>
+      <if test="type_id != null" >
+        #{type_id,jdbcType=INTEGER},
+      </if>
+      <if test="key_word != null" >
+        #{key_word,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_status != null" >
+        #{blog_status,jdbcType=BIT},
+      </if>
+      <if test="blog_content != null" >
+        #{blog_content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjs.blogserver.bean.T_blog" >
+    update t_blog
+    <set >
+      <if test="blog_title != null" >
+        blog_title = #{blog_title,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_summary != null" >
+        blog_summary = #{blog_summary,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_imgurl != null" >
+        blog_imgurl = #{blog_imgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="publish_date != null" >
+        publish_date = #{publish_date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="click_num != null" >
+        click_num = #{click_num,jdbcType=INTEGER},
+      </if>
+      <if test="replace_num != null" >
+        replace_num = #{replace_num,jdbcType=INTEGER},
+      </if>
+      <if test="type_id != null" >
+        type_id = #{type_id,jdbcType=INTEGER},
+      </if>
+      <if test="key_word != null" >
+        key_word = #{key_word,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_status != null" >
+        blog_status = #{blog_status,jdbcType=BIT},
+      </if>
+      <if test="blog_content != null" >
+        blog_content = #{blog_content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zjs.blogserver.bean.T_blog" >
+    update t_blog
+    set blog_title = #{blog_title,jdbcType=VARCHAR},
+      blog_summary = #{blog_summary,jdbcType=VARCHAR},
+      blog_imgurl = #{blog_imgurl,jdbcType=VARCHAR},
+      publish_date = #{publish_date,jdbcType=TIMESTAMP},
+      click_num = #{click_num,jdbcType=INTEGER},
+      replace_num = #{replace_num,jdbcType=INTEGER},
+      type_id = #{type_id,jdbcType=INTEGER},
+      key_word = #{key_word,jdbcType=VARCHAR},
+      blog_status = #{blog_status,jdbcType=BIT},
+      blog_content = #{blog_content,jdbcType=LONGVARCHAR}
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjs.blogserver.bean.T_blog" >
+    update t_blog
+    set blog_title = #{blog_title,jdbcType=VARCHAR},
+      blog_summary = #{blog_summary,jdbcType=VARCHAR},
+      blog_imgurl = #{blog_imgurl,jdbcType=VARCHAR},
+      publish_date = #{publish_date,jdbcType=TIMESTAMP},
+      click_num = #{click_num,jdbcType=INTEGER},
+      replace_num = #{replace_num,jdbcType=INTEGER},
+      type_id = #{type_id,jdbcType=INTEGER},
+      key_word = #{key_word,jdbcType=VARCHAR},
+      blog_status = #{blog_status,jdbcType=BIT}
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+  </update>
+</mapper>

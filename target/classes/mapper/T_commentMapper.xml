@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjs.blogserver.dao.T_commentMapper" >
+  <resultMap id="BaseResultMap" type="com.zjs.blogserver.bean.T_comment" >
+    <id column="comment_id" property="comment_id" jdbcType="INTEGER" />
+    <result column="user_ip" property="user_ip" jdbcType="VARCHAR" />
+    <result column="user_name" property="user_name" jdbcType="VARCHAR" />
+    <result column="blog_id" property="blog_id" jdbcType="INTEGER" />
+    <result column="comment_content" property="comment_content" jdbcType="VARCHAR" />
+    <result column="comment_date" property="comment_date" jdbcType="TIMESTAMP" />
+    <result column="parent_id" property="parent_id" jdbcType="INTEGER" />
+    <result column="parent_user" property="parent_user" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    comment_id, user_ip, user_name, blog_id, comment_content, comment_date, parent_id, parent_user
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_comment
+    where comment_id = #{comment_id,jdbcType=INTEGER}
+  </select>
+  <select id="findAllComment" parameterType="String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_comment
+    where 1=1
+    <if test="keyword != null and keyword != ''">
+      and user_name LIKE "%"#{keyword}"%" OR comment_content LIKE "%"#{keyword}"%" OR parent_user LIKE "%"#{keyword}"%"
+    </if>
+    order by comment_date desc
+  </select>
+  <select id="findCommentByBlogId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from t_comment
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+    order by comment_date asc
+  </select>
+  <select id="findCommentNumByBlogId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select count(*)
+    from t_comment
+    where blog_id = #{blog_id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_comment
+    where comment_id = #{comment_id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zjs.blogserver.bean.T_comment" >
+    insert into t_comment (comment_id, user_ip, user_name, blog_id,
+      comment_content, comment_date, parent_id, 
+      parent_user)
+    values (#{comment_id,jdbcType=INTEGER}, #{user_ip,jdbcType=VARCHAR}, #{user_name,jdbcType=VARCHAR},
+      #{blog_id,jdbcType=INTEGER}, #{comment_content,jdbcType=VARCHAR}, #{comment_date,jdbcType=TIMESTAMP},
+      #{parent_id,jdbcType=INTEGER}, #{parent_user,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjs.blogserver.bean.T_comment" >
+    insert into t_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="comment_id != null" >
+        comment_id,
+      </if>
+      <if test="user_ip != null" >
+        user_ip,
+      </if>
+      <if test="user_name != null" >
+        user_name,
+      </if>
+      <if test="blog_id != null" >
+        blog_id,
+      </if>
+      <if test="comment_content != null" >
+        comment_content,
+      </if>
+      <if test="comment_date != null" >
+        comment_date,
+      </if>
+      <if test="parent_id != null" >
+        parent_id,
+      </if>
+      <if test="parent_user != null" >
+        parent_user,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="comment_id != null" >
+        #{comment_id,jdbcType=INTEGER},
+      </if>
+      <if test="user_ip != null" >
+        #{user_ip,jdbcType=VARCHAR},
+      </if>
+      <if test="user_name != null" >
+        #{user_name,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_id != null" >
+        #{blog_id,jdbcType=INTEGER},
+      </if>
+      <if test="comment_content != null" >
+        #{comment_content,jdbcType=VARCHAR},
+      </if>
+      <if test="comment_date != null" >
+        #{comment_date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="parent_id != null" >
+        #{parent_id,jdbcType=INTEGER},
+      </if>
+      <if test="parent_user != null" >
+        #{parent_user,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjs.blogserver.bean.T_comment" >
+    update t_comment
+    <set >
+      <if test="user_ip != null" >
+        user_ip = #{user_ip,jdbcType=VARCHAR},
+      </if>
+      <if test="user_name != null" >
+        user_name = #{user_name,jdbcType=VARCHAR},
+      </if>
+      <if test="blog_id != null" >
+        blog_id = #{blog_id,jdbcType=INTEGER},
+      </if>
+      <if test="comment_content != null" >
+        comment_content = #{comment_content,jdbcType=VARCHAR},
+      </if>
+      <if test="comment_date != null" >
+        comment_date = #{comment_date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="parent_id != null" >
+        parent_id = #{parent_id,jdbcType=INTEGER},
+      </if>
+      <if test="parent_user != null" >
+        parent_user = #{parent_user,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where comment_id = #{comment_id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjs.blogserver.bean.T_comment" >
+    update t_comment
+    set user_ip = #{user_ip,jdbcType=VARCHAR},
+      user_name = #{user_name,jdbcType=VARCHAR},
+      blog_id = #{blog_id,jdbcType=INTEGER},
+      comment_content = #{comment_content,jdbcType=VARCHAR},
+      comment_date = #{comment_date,jdbcType=TIMESTAMP},
+      parent_id = #{parent_id,jdbcType=INTEGER},
+      parent_user = #{parent_user,jdbcType=VARCHAR}
+    where comment_id = #{comment_id,jdbcType=INTEGER}
+  </update>
+</mapper>

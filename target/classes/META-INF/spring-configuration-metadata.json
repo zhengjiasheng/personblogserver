@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "spring.web.resources",
+      "type": "com.zjs.blogserver.config.ResourceFileProperties",
+      "sourceType": "com.zjs.blogserver.config.ResourceFileProperties"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}
